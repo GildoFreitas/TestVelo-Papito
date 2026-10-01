@@ -14,6 +14,11 @@ test('deve consultar um pedido válido', async ({ page }) => {
   await page.getByRole('button', { name: 'Buscar Pedido' }).click();
 
   //Assert - Verificar o resultado
-  await expect(page.locator('//p[text()="Pedido"]/..//p[text()="VLO-G7OU8O"]')).toBeVisible();
-  await expect(page.locator('//p[text()="Pedido"]/../../..//*[text()="APROVADO"]')).toBeVisible();
+  const containerPedido = page.getByRole('paragraph')
+    .filter({ hasText: /^Pedido$/ })
+    .locator('..') //Sobe para o elemento pai (a div que agrupa ambos)
+  await expect(containerPedido).toContainText('VLO-G7OU8O')
+
+  const statusPedido = page.getByText(/^(APROVADO|REPROVADO|EM_ANALISE)$/) //Selo do status, qualquer que seja o valor
+  await expect(statusPedido).toHaveText('APROVADO')
 });
