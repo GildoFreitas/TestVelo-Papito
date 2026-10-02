@@ -1,6 +1,7 @@
-import { test, expect } from '@playwright/test';
-import { gerarCodigoPedido } from '../support/helpers';
-import { number } from 'zod';
+import { test, expect } from '@playwright/test'
+import { gerarCodigoPedido} from '../support/helpers'
+import { OrderLookupPage } from '../support/pages/OrderLookupPage'
+
 
 //AAA - Arrange, Act, Assert
 
@@ -16,6 +17,7 @@ test.describe('Consultar Pedido', () => {
 
   test('Pedido Aprovado', async ({ page }) => {
     //Test Data
+
     const order = {
       number: 'VLO-G7OU8O',
       color: 'Glacier Blue',
@@ -30,8 +32,8 @@ test.describe('Consultar Pedido', () => {
     }
 
     //Act - Executar a ação
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+    const orderLookupPage = new OrderLookupPage(page)
+    await orderLookupPage.searchOrder(order.number)
 
     //Assert - Verificar o resultado de textos
     await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
@@ -89,8 +91,8 @@ test.describe('Consultar Pedido', () => {
     }
 
     //Act - Executar a ação
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+    const orderLookupPage = new OrderLookupPage(page)
+    await orderLookupPage.searchOrder(order.number)
 
     //Assert - Verificar o resultado
     await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
@@ -148,8 +150,8 @@ test.describe('Consultar Pedido', () => {
     }
 
     //Act - Executar a ação
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(order.number)
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+    const orderLookupPage = new OrderLookupPage(page)
+    await orderLookupPage.searchOrder(order.number) 
 
     //Assert - Verificar o resultado
     await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(`
@@ -196,8 +198,8 @@ test.describe('Consultar Pedido', () => {
     const orderNumber = gerarCodigoPedido()
 
     //Act - Executar a ação
-    await page.getByRole('textbox', { name: 'Número do Pedido' }).fill(orderNumber)
-    await page.getByRole('button', { name: 'Buscar Pedido' }).click()
+    const orderLookupPage = new OrderLookupPage(page)
+    await orderLookupPage.searchOrder(orderNumber)
 
     //Assert - Verificar o resultado
     await expect(page.locator('#root')).toMatchAriaSnapshot(`
