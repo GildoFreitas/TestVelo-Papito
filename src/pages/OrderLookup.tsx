@@ -116,7 +116,7 @@ const OrderLookup = () => {
 
         {/* Not Found Message */}
         {notFound && (
-          <Card className="border-destructive/50 bg-destructive/5 animate-fade-in">
+          <Card className="border-destructive/50 bg-destructive/5 animate-fade-in" data-testid="order-not-found">
             <CardContent className="py-8 text-center">
               <XCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
               <h3 className="text-lg font-medium text-foreground mb-2">
