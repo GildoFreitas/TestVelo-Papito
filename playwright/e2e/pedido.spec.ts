@@ -1,4 +1,4 @@
-import { test } from '../support/fixtures'
+import { test, expect } from '../support/fixtures'
 import { gerarCodigoPedido } from '../support/helpers'
 import { OrderDetails } from '../support/actions/orderLookupActions'
 
@@ -101,5 +101,16 @@ test.describe('Consultar Pedido', () => {
 
         //Assert - Verificar o resultado
         await app.orderLookup.validateOrderNotFound()
+    })
+
+    test('Consulta em branco ou só com espaços', async ({ app }) => {
+        //Assert - Botão desabilitado com campo vazio
+        await expect(app.orderLookup.elements.searchButton).toBeDisabled()
+
+        //Act - Preencher só com espaços
+        await app.orderLookup.elements.orderInput.fill('      ')
+
+        //Assert - Botão continua desabilitado
+        await expect(app.orderLookup.elements.searchButton).toBeDisabled()
     })
 })
