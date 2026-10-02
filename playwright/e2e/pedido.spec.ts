@@ -28,7 +28,7 @@ test.describe('Consultar Pedido', () => {
         email: 'teste@teste.com',
       },
       payment: 'À Vista',
-      status: 'APROVADO',
+      status: 'APROVADO' as const,
     }
 
     //Act - Executar a ação
@@ -67,12 +67,7 @@ test.describe('Consultar Pedido', () => {
     `)
 
     //Assert - Verificar o resultado da badge de status
-    const statusBadge = page.getByRole('status').filter({ hasText: order.status })
-    await expect(statusBadge).toHaveClass(/bg-green-100/)
-    await expect(statusBadge).toHaveClass(/text-green-700/)
-
-    const statusIcon = statusBadge.locator('svg')
-    await expect(statusIcon).toHaveClass(/lucide-circle-check/)
+    await orderLookupPage.validateStatusBadge(order.status)
   })
 
   test('Pedido Reprovado', async ({ page }) => {
@@ -87,7 +82,7 @@ test.describe('Consultar Pedido', () => {
         email: 'teste@teste.com',
       },
       payment: 'À Vista',
-      status: 'REPROVADO',
+      status: 'REPROVADO' as const,
     }
 
     //Act - Executar a ação
@@ -125,13 +120,8 @@ test.describe('Consultar Pedido', () => {
       - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
     `)
 
-      //Assert - Verificar o resultado da badge de status
-    const statusBadge = page.getByRole('status').filter({ hasText: order.status })
-    await expect(statusBadge).toHaveClass(/bg-red-100/)
-    await expect(statusBadge).toHaveClass(/text-red-700/)
-
-    const statusIcon = statusBadge.locator('svg')
-    await expect(statusIcon).toHaveClass(/lucide-circle-x/)
+    //Assert - Verificar o resultado da badge de status
+    await orderLookupPage.validateStatusBadge(order.status)
   })
 
   test('Pedido Em Análise', async ({ page }) => {
@@ -146,7 +136,7 @@ test.describe('Consultar Pedido', () => {
         email: 'teste@teste.com',
       },
       payment: 'À Vista',
-      status: 'EM_ANALISE',
+      status: 'EM_ANALISE' as const,
     }
 
     //Act - Executar a ação
@@ -185,12 +175,7 @@ test.describe('Consultar Pedido', () => {
       `)
 
     //Assert - Verificar o resultado da badge de status
-    const statusBadge = page.getByRole('status').filter({ hasText: order.status })
-    await expect(statusBadge).toHaveClass(/bg-amber-100/)
-    await expect(statusBadge).toHaveClass(/text-amber-700/)
-
-    const statusIcon = statusBadge.locator('svg')
-    await expect(statusIcon).toHaveClass(/lucide-clock/)
+    await orderLookupPage.validateStatusBadge(order.status)
   })
 
   test('Pedido não encontrado', async ({ page }) => {
