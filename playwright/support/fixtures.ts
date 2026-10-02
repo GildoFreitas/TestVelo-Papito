@@ -1,24 +1,17 @@
 import { test as base } from '@playwright/test'
-import { Navbar } from './components/Navbar'
-import { LandingPage } from './pages/LandingPage'
-import { OrderLookupPage } from './pages/OrderLookupPage'
+import { createOrderLookupActions } from './actions/orderLookupActions'
 
-type Pages = {
-    landingPage: LandingPage
-    navbar: Navbar
-    orderLookupPage: OrderLookupPage
+type App = {
+    orderLookup: ReturnType<typeof createOrderLookupActions>
 }
 
-export const test = base.extend<Pages>({
-    landingPage: async ({ page }, use) => {
-        await use(new LandingPage(page))
+export const test = base.extend<{ app: App }>({
+    app: async ({ page }, use) => {
+        const app: App = {
+            orderLookup: createOrderLookupActions(page),
+        }
+        await use(app)
     },
-    navbar: async ({ page }, use) => {
-        await use(new Navbar(page))
-    },
-    orderLookupPage: async ({ page }, use) => {
-        await use(new OrderLookupPage(page))
-    }
 })
 
 export { expect } from '@playwright/test'

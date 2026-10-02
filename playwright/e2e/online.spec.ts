@@ -1,6 +1,8 @@
-import { test } from '../support/fixtures'
+import { test, expect } from '@playwright/test'
 
-test('Webapp  is online', async ({ landingPage }) => {
-    await landingPage.goto()
-    await landingPage.validateTitle()
+test('Webapp  is online', async ({ page }) => {
+  await page.goto('/')
+
+  // Expect a title "to contain" a substring.
+  await expect(page).toHaveTitle(/Velô by Papito/)
 })

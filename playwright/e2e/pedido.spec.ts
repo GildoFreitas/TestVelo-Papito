@@ -1,20 +1,18 @@
 import { test } from '../support/fixtures'
 import { gerarCodigoPedido } from '../support/helpers'
-import { OrderDetails } from '../support/pages/OrderLookupPage'
+import { OrderDetails } from '../support/actions/orderLookupActions'
 
 
 //AAA - Arrange, Act, Assert
 
 test.describe('Consultar Pedido', () => {
 
-    test.beforeEach(async ({ landingPage, navbar, orderLookupPage }) => {
+    test.beforeEach(async ({ app }) => {
         //Arrange - Preparar o cenário
-        await landingPage.goto()
-        await navbar.clickConsultarPedido()
-        await orderLookupPage.validatePageLoaded()
+        await app.orderLookup.open()
     })
 
-    test('Pedido Aprovado', async ({ orderLookupPage }) => {
+    test('Pedido Aprovado', async ({ app }) => {
         //Test Data
         const order: OrderDetails = {
             number: 'VLO-G7OU8O',
@@ -30,13 +28,14 @@ test.describe('Consultar Pedido', () => {
         }
 
         //Act - Executar a ação
-        await orderLookupPage.searchOrder(order.number)
+        await app.orderLookup.searchOrder(order.number)
 
         //Assert - Verificar o resultado
-        await orderLookupPage.validateOrder(order)
+        await app.orderLookup.validateOrderDetails(order)
+        await app.orderLookup.validateStatusBadge(order.status)
     })
 
-    test('Pedido Reprovado', async ({ orderLookupPage }) => {
+    test('Pedido Reprovado', async ({ app }) => {
         //Test Data
         const order: OrderDetails = {
             number: 'VLO-NHDCIO',
@@ -52,13 +51,14 @@ test.describe('Consultar Pedido', () => {
         }
 
         //Act - Executar a ação
-        await orderLookupPage.searchOrder(order.number)
+        await app.orderLookup.searchOrder(order.number)
 
         //Assert - Verificar o resultado
-        await orderLookupPage.validateOrder(order)
+        await app.orderLookup.validateOrderDetails(order)
+        await app.orderLookup.validateStatusBadge(order.status)
     })
 
-    test('Pedido Em Análise', async ({ orderLookupPage }) => {
+    test('Pedido Em Análise', async ({ app }) => {
         //Test Data
         const order: OrderDetails = {
             number: 'VLO-LP245L',
@@ -74,31 +74,32 @@ test.describe('Consultar Pedido', () => {
         }
 
         //Act - Executar a ação
-        await orderLookupPage.searchOrder(order.number)
+        await app.orderLookup.searchOrder(order.number)
 
         //Assert - Verificar o resultado
-        await orderLookupPage.validateOrder(order)
+        await app.orderLookup.validateOrderDetails(order)
+        await app.orderLookup.validateStatusBadge(order.status)
     })
 
-    test('Pedido não encontrado', async ({ orderLookupPage }) => {
+    test('Pedido não encontrado', async ({ app }) => {
         //Test Data
         const orderNumber = gerarCodigoPedido()
 
         //Act - Executar a ação
-        await orderLookupPage.searchOrder(orderNumber)
+        await app.orderLookup.searchOrder(orderNumber)
 
         //Assert - Verificar o resultado
-        await orderLookupPage.validateOrderNotFound()
+        await app.orderLookup.validateOrderNotFound()
     })
 
-    test('Pedido em formato não padrão', async ({ orderLookupPage }) => {
+    test('Pedido em formato não padrão', async ({ app }) => {
         //Test Data
         const orderNumber = '123'
 
         //Act - Executar a ação
-        await orderLookupPage.searchOrder(orderNumber)
+        await app.orderLookup.searchOrder(orderNumber)
 
         //Assert - Verificar o resultado
-        await orderLookupPage.validateOrderNotFound()
+        await app.orderLookup.validateOrderNotFound()
     })
 })
