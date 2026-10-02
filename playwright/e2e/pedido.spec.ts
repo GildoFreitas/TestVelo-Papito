@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { gerarCodigoPedido } from '../support/helpers';
 
 //AAA - Arrange, Act, Assert
 
@@ -28,7 +29,7 @@ test('Pedido válido', async ({ page }) => {
 
 test('Pedido não encontrado', async ({ page }) => {
   //Test Data
-  const orderId = 'VLO-ABC123';
+  const orderId = gerarCodigoPedido();
   
   //Arrange - Preparar o cenário
   await page.goto('http://localhost:5173/');
