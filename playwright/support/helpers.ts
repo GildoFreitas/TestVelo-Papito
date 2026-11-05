@@ -1,3 +1,8 @@
+export function precoRegex(amount: string): RegExp {
+    const escaped = amount.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    return new RegExp(`R\\$\\s*${escaped}`)
+}
+
 export function gerarCodigoPedido() {
     const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let codigo = 'VLO-';

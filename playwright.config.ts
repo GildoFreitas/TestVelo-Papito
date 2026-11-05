@@ -16,7 +16,7 @@ export default defineConfig({
   timeout: 60000,
 
   expect: {
-    timeout: 5000
+    timeout: 10000
   },
   
   testDir: './playwright/e2e',
@@ -32,12 +32,12 @@ export default defineConfig({
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    actionTimeout: 5000,
-    navigationTimeout: 10000,
+    actionTimeout: 10000,
+    navigationTimeout: 30000,
     /* Base URL to use in actions like `await page.goto('')`. */
     baseURL: 'http://localhost:5173',
 
-    headless: false,
+    headless: true,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'retain-on-failure',

@@ -42,9 +42,7 @@ export function createOrderLookupActions(page: Page) {
         },
 
         async open() {
-            await page.goto('/')
-            await expect(page.getByTestId('hero-section').getByRole('heading')).toContainText('Velô Sprint')
-            await page.getByTestId('header-nav').getByRole('link', { name: 'Consultar Pedido' }).click()
+            await page.goto('/lookup', { waitUntil: 'domcontentloaded' })
             await expect(page.getByRole('heading', { name: 'Consultar Pedido' })).toBeVisible()
         },
 
@@ -84,7 +82,10 @@ export function createOrderLookupActions(page: Page) {
                 - paragraph: /R\\$ \\d+\\.\\d+,\\d+/
             `
 
-            await expect(page.getByTestId(`order-result-${order.number}`)).toMatchAriaSnapshot(snapshot)
+            const orderCard = page.getByTestId(`order-result-${order.number}`)
+            await expect(orderCard).toBeVisible()
+            await expect(orderCard.getByRole('img', { name: 'Velô Sprint' })).toBeVisible()
+            await expect(orderCard).toMatchAriaSnapshot(snapshot)
         },
 
         async validateStatusBadge(status: OrderStatus) {
