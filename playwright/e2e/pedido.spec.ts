@@ -3,6 +3,7 @@ import { gerarCodigoPedido } from '../support/helpers'
 import { OrderDetails } from '../support/actions/orderLookupActions'
 import { closeDb } from '../support/database/database'
 import { deleteOrderByNumber, insertOrder } from '../support/database/orderRepository'
+import orders from '../support/fixtures/orders.json' with { type: 'json' }
 
 
 //AAA - Arrange, Act, Assert
@@ -21,21 +22,7 @@ test.describe('Consultar Pedido', () => {
 
     test('Pedido Aprovado', async ({ app }) => {
         //Test Data
-        const order: OrderDetails = {
-            number: 'VLO-G7OU8O',
-            color: 'Glacier Blue',
-            interior: 'cream',
-            wheels: 'sport Wheels',
-            customer: {
-                name: 'Abel Freitas',
-                email: 'teste@teste.com',
-                phone: '(84) 88888-8887',
-                document: '000.000.040-01',
-            },
-            payment: 'À Vista',
-            total_price: '42000',
-            status: 'APROVADO',
-        }
+        const order = orders.approved as OrderDetails
 
         await deleteOrderByNumber(order.number)
         await insertOrder(order)
@@ -50,21 +37,7 @@ test.describe('Consultar Pedido', () => {
 
     test('Pedido Reprovado', async ({ app }) => {
         //Test Data
-        const order: OrderDetails = {
-            number: 'VLO-NHDCIO',
-            color: 'Glacier Blue',
-            interior: 'cream',
-            wheels: 'sport Wheels',
-            customer: {
-                name: 'Gildo Freitas',
-                email: 'teste@teste.com',
-                phone: '(55) 48484-8484',
-                document: '000.000.141-01',
-            },
-            payment: 'À Vista',
-            total_price: '42000',
-            status: 'REPROVADO',
-        }
+        const order = orders.rejected as OrderDetails
 
         await deleteOrderByNumber(order.number)
         await insertOrder(order)
@@ -79,21 +52,7 @@ test.describe('Consultar Pedido', () => {
 
     test('Pedido Em Análise', async ({ app }) => {
         //Test Data
-        const order: OrderDetails = {
-            number: 'VLO-LP245L',
-            color: 'Lunar White',
-            interior: 'cream',
-            wheels: 'sport Wheels',
-            customer: {
-                name: 'Isa Falcão',
-                email: 'teste@teste.com',
-                phone: '(84) 98879-4448',
-                document: '703.847.456-44',
-            },
-            payment: 'À Vista',
-            total_price: '42000',
-            status: 'EM_ANALISE',
-        }
+        const order = orders.under_analysis as OrderDetails
 
         await deleteOrderByNumber(order.number)
         await insertOrder(order)

@@ -1,0 +1,47 @@
+{
+  "approved": {
+    "number": "VLO-G7OU8O",
+    "color": "Glacier Blue",
+    "interior": "cream",
+    "wheels": "sport Wheels",
+    "customer": {
+      "name": "Abel Freitas",
+      "email": "teste@teste.com",
+      "phone": "(84) 88888-8887",
+      "document": "000.000.040-01"
+    },
+    "payment": "À Vista",
+    "total_price": "42000",
+    "status": "APROVADO"
+  },
+  "rejected": {
+    "number": "VLO-NHDCIO",
+    "color": "Glacier Blue",
+    "interior": "cream",
+    "wheels": "sport Wheels",
+    "customer": {
+      "name": "Gildo Freitas",
+      "email": "teste@teste.com",
+      "phone": "(55) 48484-8484",
+      "document": "000.000.141-01"
+    },
+    "payment": "À Vista",
+    "total_price": "42000",
+    "status": "REPROVADO"
+  },
+  "under_analysis": {
+    "number": "VLO-LP245L",
+    "color": "Lunar White",
+    "interior": "cream",
+    "wheels": "sport Wheels",
+    "customer": {
+      "name": "Isa Falcão",
+      "email": "teste@teste.com",
+      "phone": "(84) 98879-4448",
+      "document": "703.847.456-44"
+    },
+    "payment": "À Vista",
+    "total_price": "42000",
+    "status": "EM_ANALISE"
+  }
+}
