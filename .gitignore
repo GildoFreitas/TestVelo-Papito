@@ -23,6 +23,12 @@ dist-ssr
 *.sln
 *.sw?
 
+# Secrets
+.env
+.env.*
+!.env.example
+docs/db-password.txt
+
 # Playwright
 /test-results/
 /playwright-report/

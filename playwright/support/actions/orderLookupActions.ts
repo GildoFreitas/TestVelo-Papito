@@ -8,8 +8,9 @@ export interface OrderDetails {
     color: string
     interior: string
     wheels: string
-    customer: { name: string; email: string }
+    customer: { name: string; email: string; phone: string; document: string }
     payment: string
+    total_price: string
 }
 
 const statusClasses = {

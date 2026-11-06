@@ -1,11 +1,18 @@
 import { test, expect } from '../support/fixtures'
 import { gerarCodigoPedido } from '../support/helpers'
 import { OrderDetails } from '../support/actions/orderLookupActions'
+import { closeDb } from '../support/database/database'
+import { deleteOrderByNumber, insertOrder } from '../support/database/orderRepository'
 
 
 //AAA - Arrange, Act, Assert
 
 test.describe('Consultar Pedido', () => {
+
+    // Os pedidos ficam no banco depois dos testes; só a conexão é encerrada.
+    test.afterAll(async () => {
+        await closeDb()
+    })
 
     test.beforeEach(async ({ app }) => {
         //Arrange - Preparar o cenário
@@ -22,10 +29,16 @@ test.describe('Consultar Pedido', () => {
             customer: {
                 name: 'Abel Freitas',
                 email: 'teste@teste.com',
+                phone: '(84) 88888-8887',
+                document: '000.000.040-01',
             },
             payment: 'À Vista',
+            total_price: '42000',
             status: 'APROVADO',
         }
+
+        await deleteOrderByNumber(order.number)
+        await insertOrder(order)
 
         //Act - Executar a ação
         await app.orderLookup.searchOrder(order.number)
@@ -45,10 +58,16 @@ test.describe('Consultar Pedido', () => {
             customer: {
                 name: 'Gildo Freitas',
                 email: 'teste@teste.com',
+                phone: '(55) 48484-8484',
+                document: '000.000.141-01',
             },
             payment: 'À Vista',
+            total_price: '42000',
             status: 'REPROVADO',
         }
+
+        await deleteOrderByNumber(order.number)
+        await insertOrder(order)
 
         //Act - Executar a ação
         await app.orderLookup.searchOrder(order.number)
@@ -68,10 +87,16 @@ test.describe('Consultar Pedido', () => {
             customer: {
                 name: 'Isa Falcão',
                 email: 'teste@teste.com',
+                phone: '(84) 98879-4448',
+                document: '703.847.456-44',
             },
             payment: 'À Vista',
+            total_price: '42000',
             status: 'EM_ANALISE',
         }
+
+        await deleteOrderByNumber(order.number)
+        await insertOrder(order)
 
         //Act - Executar a ação
         await app.orderLookup.searchOrder(order.number)
