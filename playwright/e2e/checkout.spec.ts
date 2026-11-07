@@ -98,11 +98,6 @@ test.describe('Checkout - Validação de campos obrigatórios e dados inválidos
     })
 
     test('CT04.4 - CPF incompleto exibe "CPF inválido"', async ({ app }) => {
-        // DEFEITO CONHECIDO: a máscara devolve "123.456.___-__" (14 caracteres) e o
-        // schema só valida min(14), então o CPF incompleto é aceito. Remover test.fail()
-        // quando o CPF passar a ser validado corretamente.
-        test.fail(true, 'CPF incompleto com máscara é aceito pelo schema (min 14 caracteres)')
-
         //Arrange
         await app.checkout.fillCustomer({ ...customer, cpf: invalid.incompleteCpf })
         await app.checkout.selectStore(store)
@@ -115,7 +110,30 @@ test.describe('Checkout - Validação de campos obrigatórios e dados inválidos
         await app.checkout.validateFieldError('cpf', 'CPF inválido')
     })
 
-    test('CT04.5 - Sem aceitar os Termos o pedido não é enviado', async ({ app }) => {
+    // CPFs completos (máscara preenchida), mas inválidos: o primeiro com dígito verificador
+    // errado (o válido do fixture é 529.982.247-25) e o segundo com todos os dígitos iguais.
+    const completeInvalidCpfs = [
+        { label: 'dígito verificador incorreto', cpf: invalid.cpfWrongCheckDigit },
+        { label: 'todos os dígitos iguais', cpf: invalid.cpfRepeatedDigits },
+    ]
+
+    for (const { label, cpf } of completeInvalidCpfs) {
+        test(`CT04.5 - CPF completo com ${label} exibe "CPF inválido"`, async ({ app }) => {
+            //Arrange
+            await app.checkout.fillCustomer({ ...customer, cpf })
+            await app.checkout.selectStore(store)
+            await app.checkout.acceptTerms()
+
+            //Act
+            await app.checkout.submit()
+
+            //Assert
+            await app.checkout.validateFieldError('cpf', 'CPF inválido')
+            await app.checkout.validatePage()
+        })
+    }
+
+    test('CT04.6 - Sem aceitar os Termos o pedido não é enviado', async ({ app }) => {
         //Arrange - Todos os dados válidos, exceto o aceite dos termos
         await app.checkout.fillCustomer(customer)
         await app.checkout.selectStore(store)

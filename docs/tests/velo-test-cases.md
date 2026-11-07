@@ -97,8 +97,9 @@ Validar os critérios de obrigatoriedade dos campos de dados pessoais no Checkou
 | 1  | Deixar todos os campos do formulário em branco e clicar em "Confirmar Pedido" | O sistema não avança e exibe mensagens de erro sob os campos (Nome, Sobrenome, Email, Tel, CPF, Loja, Termos). |
 | 2  | Inserir apenas 1 letra no campo "Nome" e "Sobrenome" e confirmar | O sistema exibe erro: "Nome deve ter pelo menos 2 caracteres". |
 | 3  | Inserir um e-mail sem formato válido (ex: `cliente@.com`) e confirmar | O sistema exibe erro: "Email inválido". |
-| 4  | Inserir CPF incompleto ou inválido e confirmar | O sistema exibe erro de "CPF inválido". |
-| 5  | Preencher todos os campos corretamente, mas não marcar "Li e aceito os Termos" | O sistema exibe erro: "Aceite os termos". |
+| 4  | Inserir CPF incompleto (ex: `123.456.___-__`) e confirmar | O sistema exibe erro de "CPF inválido". |
+| 5  | Inserir CPF completo, mas inválido (ex: `529.982.247-26`, dígito verificador incorreto, ou `111.111.111-11`, dígitos repetidos) e confirmar | O sistema não avança e exibe erro de "CPF inválido". |
+| 6  | Preencher todos os campos corretamente, mas não marcar "Li e aceito os Termos" | O sistema exibe erro: "Aceite os termos". |
 
 #### Resultados Esperados
 - Nenhuma submissão real é feita se o formulário apresentar erros de validação nos dados fornecidos pelo cliente.
@@ -106,6 +107,7 @@ Validar os critérios de obrigatoriedade dos campos de dados pessoais no Checkou
 #### Critérios de Aceitação
 - Nome e Sobrenome devem exigir mínimo de 2 caracteres.
 - Telefone e CPF exigem formato e quantidade mínima de caracteres completados (máscara preenchida).
+- O CPF deve ser válido: dígitos verificadores corretos e não pode ter todos os dígitos iguais.
 - O checkbox de termos deve ser obrigatoriamente marcado.
 
 ---

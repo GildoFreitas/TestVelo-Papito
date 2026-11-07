@@ -4,6 +4,7 @@ import InputMask from 'react-input-mask';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { z } from 'zod';
 import { cn } from '@/lib/utils';
+import { isValidCpf } from '@/lib/cpf';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -63,7 +64,12 @@ const orderSchema = z.object({
   surname: z.string().min(2, 'Sobrenome deve ter pelo menos 2 caracteres'),
   email: z.string().email('Email inválido'),
   phone: z.string().min(14, 'Telefone inválido'),
-  cpf: z.string().min(14, 'CPF inválido'),
+  // A máscara devolve "123.456.___-__" (14 caracteres) quando incompleto, então o
+  // tamanho não basta: validamos o formato completo e os dígitos verificadores.
+  cpf: z
+    .string()
+    .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, 'CPF inválido')
+    .refine(isValidCpf, 'CPF inválido'),
   store: z.string().min(1, 'Selecione uma loja'),
   terms: z.boolean().refine((val) => val === true, 'Aceite os termos'),
 });

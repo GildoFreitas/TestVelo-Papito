@@ -12,6 +12,8 @@
     "shortSurname": "B",
     "emailWithoutDomain": "cliente@dominio",
     "emailNativeInvalid": "cliente@.com",
-    "incompleteCpf": "123456"
+    "incompleteCpf": "123456",
+    "cpfWrongCheckDigit": "52998224726",
+    "cpfRepeatedDigits": "11111111111"
   }
 }
