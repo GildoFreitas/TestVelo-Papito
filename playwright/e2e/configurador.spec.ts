@@ -6,7 +6,7 @@ test.describe('Configurador', () => {
         await app.configurator.open()
     })
 
-    test('CT02 - Trocar a cor não altera o preço', async ({ app }) => {
+    test('CT02.1 - Trocar a cor não altera o preço', async ({ app }) => {
         await app.configurator.validateCarImage(/glacier-blue with aero wheels/)
         await app.configurator.validatePrice('40.000,00')
 
@@ -16,7 +16,7 @@ test.describe('Configurador', () => {
         await app.configurator.validatePrice('40.000,00')
     })
 
-    test('CT02 - Rodas Sport somam R$ 2.000,00 e Aero remove o acréscimo', async ({ app }) => {
+    test('CT02.2 - Rodas Sport somam R$ 2.000,00 e Aero remove o acréscimo', async ({ app }) => {
         await app.configurator.validatePrice('40.000,00')
 
         await app.configurator.selectWheels('Sport Wheels')
