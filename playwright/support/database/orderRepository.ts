@@ -39,3 +39,9 @@ export async function insertOrder(order: OrderDetails) {
 export async function deleteOrderByNumber(orderNumber: string) {
     await db.deleteFrom('orders').where('order_number', '=', orderNumber).execute()
 }
+
+// Para pedidos criados pelo próprio app (número aleatório), onde não há um número fixo
+// para apagar: o e-mail do cliente de teste é a chave de limpeza.
+export async function deleteOrdersByEmail(email: string) {
+    await db.deleteFrom('orders').where('customer_email', '=', email).execute()
+}

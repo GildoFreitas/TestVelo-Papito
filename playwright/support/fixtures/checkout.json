@@ -1,0 +1,17 @@
+{
+  "customer": {
+    "name": "Maria",
+    "surname": "Silva",
+    "email": "maria.silva@example.com",
+    "phone": "11999998888",
+    "cpf": "52998224725"
+  },
+  "store": "Velô Paulista - Av. Paulista, 1000",
+  "invalid": {
+    "shortName": "A",
+    "shortSurname": "B",
+    "emailWithoutDomain": "cliente@dominio",
+    "emailNativeInvalid": "cliente@.com",
+    "incompleteCpf": "123456"
+  }
+}

@@ -1,5 +1,5 @@
 import { Page, expect } from '@playwright/test'
-import { escapeRegex, precoRegex } from '../helpers'
+import { precoRegex } from '../helpers'
 
 export type CustomerData = {
     name: string
@@ -8,6 +8,8 @@ export type CustomerData = {
     phone: string
     cpf: string
 }
+
+export type CheckoutField = 'name' | 'surname' | 'email' | 'phone' | 'cpf' | 'store' | 'terms'
 
 export type CheckoutFieldError =
     | 'Nome deve ter pelo menos 2 caracteres'
@@ -33,13 +35,9 @@ export function createCheckoutActions(page: Page) {
         submitButton: page.getByRole('button', { name: 'Confirmar Pedido' }),
     }
 
-    // Localizador por texto, independente da tag e de classes (só quebra se a mensagem mudar):
-    // - RegExp é case-sensitive, então "Nome deve..." não casa com "Sobrenome deve...".
-    // - O placeholder "Selecione uma loja" tem o mesmo texto do erro; ele vive dentro do
-    //   combobox, então excluímos qualquer elemento descendente de role="combobox".
-    const outsideCombobox = page.locator(':not([role="combobox"] *)')
-    const fieldError = (message: CheckoutFieldError) =>
-        page.getByText(new RegExp(escapeRegex(message))).and(outsideCombobox)
+    // As mensagens de erro não têm role/label acessível; o data-testid "checkout-<campo>-error"
+    // identifica o campo e evita colisões de texto (ex.: placeholder "Selecione uma loja").
+    const fieldError = (field: CheckoutField) => page.getByTestId(`checkout-${field}-error`)
 
     async function validatePage() {
         await expect(page).toHaveURL('/order')
@@ -72,12 +70,13 @@ export function createCheckoutActions(page: Page) {
             await elements.submitButton.click()
         },
 
-        async validateFieldError(message: CheckoutFieldError) {
-            await expect(fieldError(message)).toBeVisible()
+        async validateFieldError(field: CheckoutField, message: CheckoutFieldError) {
+            await expect(fieldError(field)).toBeVisible()
+            await expect(fieldError(field)).toHaveText(message)
         },
 
-        async validateNoFieldError(message: CheckoutFieldError) {
-            await expect(fieldError(message)).toHaveCount(0)
+        async validateNoFieldError(field: CheckoutField) {
+            await expect(fieldError(field)).toHaveCount(0)
         },
 
         async validateSummaryTotal(amount: string) {

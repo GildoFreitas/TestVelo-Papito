@@ -1,66 +1,81 @@
 import { test } from '../support/fixtures'
-import { CheckoutFieldError, CustomerData } from '../support/actions/checkoutActions'
+import { CheckoutField, CheckoutFieldError, CustomerData } from '../support/actions/checkoutActions'
+import { deleteOrdersByEmail } from '../support/database/orderRepository'
+import checkout from '../support/fixtures/checkout.json' with { type: 'json' }
 
-const STORE = 'Velô Paulista - Av. Paulista, 1000'
-
-const validCustomer: CustomerData = {
-    name: 'Maria',
-    surname: 'Silva',
-    email: 'maria.silva@example.com',
-    phone: '11999998888',
-    cpf: '52998224725',
-}
+//AAA - Arrange, Act, Assert
 
 test.describe('Checkout - Validação de campos obrigatórios e dados inválidos', () => {
 
-    // Pré-condição: o cliente configurou o carro (padrão) e está no Checkout (/order)
+    //Test Data
+    const customer = checkout.customer as CustomerData
+    const store = checkout.store
+    const invalid = checkout.invalid
+
+    // Não encerramos a conexão aqui: ela é compartilhada com outros specs no mesmo worker
+    // (o pedido.spec.ts já chama closeDb() no afterAll e fecharia para os demais).
     test.beforeEach(async ({ app }) => {
+        //Arrange - Remove pedidos de execuções anteriores para não gerar duplicidade
+        // (o app gera o número do pedido, então a chave de limpeza é o e-mail do cliente)
+        await deleteOrdersByEmail(customer.email)
+
+        //Arrange - Pré-condição: o cliente configurou o carro (padrão) e está no Checkout (/order)
         await app.configurator.open()
         await app.configurator.goToCheckout()
         await app.checkout.validatePage()
     })
 
     test('CT04.1 - Formulário em branco exibe erro em todos os campos', async ({ app }) => {
-        const expectedErrors: CheckoutFieldError[] = [
-            'Nome deve ter pelo menos 2 caracteres',
-            'Sobrenome deve ter pelo menos 2 caracteres',
-            'Email inválido',
-            'Telefone inválido',
-            'CPF inválido',
-            'Selecione uma loja',
-            'Aceite os termos',
+        //Test Data
+        const expectedErrors: [CheckoutField, CheckoutFieldError][] = [
+            ['name', 'Nome deve ter pelo menos 2 caracteres'],
+            ['surname', 'Sobrenome deve ter pelo menos 2 caracteres'],
+            ['email', 'Email inválido'],
+            ['phone', 'Telefone inválido'],
+            ['cpf', 'CPF inválido'],
+            ['store', 'Selecione uma loja'],
+            ['terms', 'Aceite os termos'],
         ]
 
+        //Act - Executar a ação
         await app.checkout.submit()
 
-        for (const message of expectedErrors) {
-            await app.checkout.validateFieldError(message)
+        //Assert - Verificar o resultado
+        for (const [field, message] of expectedErrors) {
+            await app.checkout.validateFieldError(field, message)
         }
         await app.checkout.validatePage()
     })
 
     test('CT04.2 - Nome e Sobrenome com 1 caractere são rejeitados', async ({ app }) => {
-        await app.checkout.fillCustomer({ ...validCustomer, name: 'A', surname: 'B' })
-        await app.checkout.selectStore(STORE)
+        //Arrange
+        await app.checkout.fillCustomer({ ...customer, name: invalid.shortName, surname: invalid.shortSurname })
+        await app.checkout.selectStore(store)
         await app.checkout.acceptTerms()
 
+        //Act
         await app.checkout.submit()
 
-        await app.checkout.validateFieldError('Nome deve ter pelo menos 2 caracteres')
-        await app.checkout.validateFieldError('Sobrenome deve ter pelo menos 2 caracteres')
+        //Assert
+        await app.checkout.validateFieldError('name', 'Nome deve ter pelo menos 2 caracteres')
+        await app.checkout.validateFieldError('surname', 'Sobrenome deve ter pelo menos 2 caracteres')
         await app.checkout.validatePage()
     })
 
     test('CT04.3 - E-mail sem formato válido é rejeitado', async ({ app }) => {
         // "cliente@.com" é barrado pela validação nativa do navegador (type="email") antes
         // do zod rodar; por isso o teste usa "cliente@dominio", que só o zod rejeita.
-        await app.checkout.fillCustomer({ ...validCustomer, email: 'cliente@dominio' })
-        await app.checkout.selectStore(STORE)
+
+        //Arrange
+        await app.checkout.fillCustomer({ ...customer, email: invalid.emailWithoutDomain })
+        await app.checkout.selectStore(store)
         await app.checkout.acceptTerms()
 
+        //Act
         await app.checkout.submit()
 
-        await app.checkout.validateFieldError('Email inválido')
+        //Assert
+        await app.checkout.validateFieldError('email', 'Email inválido')
         await app.checkout.validatePage()
     })
 
@@ -70,13 +85,16 @@ test.describe('Checkout - Validação de campos obrigatórios e dados inválidos
         // quando o comportamento esperado em CT04 passo 3 for implementado.
         test.fail(true, 'Validação nativa do navegador impede a exibição de "Email inválido"')
 
-        await app.checkout.fillCustomer({ ...validCustomer, email: 'cliente@.com' })
-        await app.checkout.selectStore(STORE)
+        //Arrange
+        await app.checkout.fillCustomer({ ...customer, email: invalid.emailNativeInvalid })
+        await app.checkout.selectStore(store)
         await app.checkout.acceptTerms()
 
+        //Act
         await app.checkout.submit()
 
-        await app.checkout.validateFieldError('Email inválido')
+        //Assert
+        await app.checkout.validateFieldError('email', 'Email inválido')
     })
 
     test('CT04.4 - CPF incompleto exibe "CPF inválido"', async ({ app }) => {
@@ -85,28 +103,34 @@ test.describe('Checkout - Validação de campos obrigatórios e dados inválidos
         // quando o CPF passar a ser validado corretamente.
         test.fail(true, 'CPF incompleto com máscara é aceito pelo schema (min 14 caracteres)')
 
-        await app.checkout.fillCustomer({ ...validCustomer, cpf: '123456' })
-        await app.checkout.selectStore(STORE)
+        //Arrange
+        await app.checkout.fillCustomer({ ...customer, cpf: invalid.incompleteCpf })
+        await app.checkout.selectStore(store)
         await app.checkout.acceptTerms()
 
+        //Act
         await app.checkout.submit()
 
-        await app.checkout.validateFieldError('CPF inválido')
+        //Assert
+        await app.checkout.validateFieldError('cpf', 'CPF inválido')
     })
 
     test('CT04.5 - Sem aceitar os Termos o pedido não é enviado', async ({ app }) => {
-        await app.checkout.fillCustomer(validCustomer)
-        await app.checkout.selectStore(STORE)
+        //Arrange - Todos os dados válidos, exceto o aceite dos termos
+        await app.checkout.fillCustomer(customer)
+        await app.checkout.selectStore(store)
 
+        //Act
         await app.checkout.submit()
 
-        await app.checkout.validateFieldError('Aceite os termos')
-        await app.checkout.validateNoFieldError('Nome deve ter pelo menos 2 caracteres')
-        await app.checkout.validateNoFieldError('Sobrenome deve ter pelo menos 2 caracteres')
-        await app.checkout.validateNoFieldError('Email inválido')
-        await app.checkout.validateNoFieldError('Telefone inválido')
-        await app.checkout.validateNoFieldError('CPF inválido')
-        await app.checkout.validateNoFieldError('Selecione uma loja')
+        //Assert
+        await app.checkout.validateFieldError('terms', 'Aceite os termos')
+        await app.checkout.validateNoFieldError('name')
+        await app.checkout.validateNoFieldError('surname')
+        await app.checkout.validateNoFieldError('email')
+        await app.checkout.validateNoFieldError('phone')
+        await app.checkout.validateNoFieldError('cpf')
+        await app.checkout.validateNoFieldError('store')
         await app.checkout.validatePage()
     })
 })
