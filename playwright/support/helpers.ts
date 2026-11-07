@@ -1,6 +1,9 @@
+export function escapeRegex(text: string): string {
+    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 export function precoRegex(amount: string): RegExp {
-    const escaped = amount.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    return new RegExp(`R\\$\\s*${escaped}`)
+    return new RegExp(`R\\$\\s*${escapeRegex(amount)}`)
 }
 
 export function gerarCodigoPedido() {
