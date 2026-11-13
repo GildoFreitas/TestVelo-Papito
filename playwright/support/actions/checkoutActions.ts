@@ -20,6 +20,8 @@ export type CheckoutFieldError =
     | 'Selecione uma loja'
     | 'Aceite os termos'
 
+export type PaymentMethod = 'À Vista' | 'Financiamento'
+
 export function createCheckoutActions(page: Page) {
     const summaryTotal = page.getByTestId('summary-total-price')
 
@@ -66,8 +68,22 @@ export function createCheckoutActions(page: Page) {
             await elements.terms.check()
         },
 
+        // Cada forma de pagamento é um botão com o nome + valor (ex.: "À Vista R$ 40.000,00")
+        async selectPayment(method: PaymentMethod) {
+            await page.getByRole('button', { name: method }).click()
+        },
+
+        async validatePaymentAmount(method: PaymentMethod, amount: string) {
+            await expect(page.getByRole('button', { name: method })).toContainText(precoRegex(amount))
+        },
+
         async submit() {
             await elements.submitButton.click()
+        },
+
+        // Durante o envio o botão troca o texto para "Processando..." e fica desabilitado
+        async validateSubmitLoading() {
+            await expect(page.getByRole('button', { name: 'Processando...' })).toBeDisabled()
         },
 
         async validateFieldError(field: CheckoutField, message: CheckoutFieldError) {

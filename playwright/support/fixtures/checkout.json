@@ -7,6 +7,10 @@
     "cpf": "52998224725"
   },
   "store": "Velô Paulista - Av. Paulista, 1000",
+  "defaultCar": {
+    "color": "Glacier Blue",
+    "price": "40.000,00"
+  },
   "invalid": {
     "shortName": "A",
     "shortSurname": "B",

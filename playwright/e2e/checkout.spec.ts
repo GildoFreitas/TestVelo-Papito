@@ -152,3 +152,56 @@ test.describe('Checkout - Validação de campos obrigatórios e dados inválidos
         await app.checkout.validatePage()
     })
 })
+
+test.describe('Checkout e Confirmação - Pagamento à vista (fluxo feliz)', () => {
+
+    //Test Data
+    const customer = checkout.customer as CustomerData
+    const store = checkout.store
+    const car = checkout.defaultCar
+
+    test.beforeEach(async ({ app }) => {
+        //Arrange - Remove pedidos de execuções anteriores (a chave de limpeza é o e-mail do cliente)
+        await deleteOrdersByEmail(customer.email)
+
+        //Arrange - Pré-condição: carro de configuração básica (R$ 40.000,00) no Checkout (/order)
+        await app.configurator.open()
+        await app.configurator.goToCheckout()
+        await app.checkout.validateSummaryTotal(car.price)
+    })
+
+    test('CT05 - Pedido à vista é criado com status Aprovado', async ({ app }) => {
+        //Arrange - Passo 1: dados válidos e loja selecionada
+        await app.checkout.fillCustomer(customer)
+        await app.checkout.selectStore(store)
+        await app.checkout.validateNoFieldError('name')
+        await app.checkout.validateNoFieldError('surname')
+        await app.checkout.validateNoFieldError('email')
+        await app.checkout.validateNoFieldError('phone')
+        await app.checkout.validateNoFieldError('cpf')
+        await app.checkout.validateNoFieldError('store')
+
+        //Act - Passo 2: forma de pagamento "À Vista"
+        await app.checkout.selectPayment('À Vista')
+
+        //Assert - Resumo e À Vista exibem o valor total
+        await app.checkout.validateSummaryTotal(car.price)
+        await app.checkout.validatePaymentAmount('À Vista', car.price)
+
+        //Act - Passo 3: aceite dos termos e confirmação do pedido
+        await app.checkout.acceptTerms()
+        await app.checkout.submit()
+
+        //Assert - Botão em carregamento e redirecionamento para a Confirmação
+        await app.checkout.validateSubmitLoading()
+        await app.confirmation.validatePage()
+
+        //Assert - Passo 4: página de Confirmação
+        await app.confirmation.validateOrderApproved()
+        await app.confirmation.validateOrderNumber()
+        await app.confirmation.validateCustomer(`${customer.name} ${customer.surname}`, customer.email, store)
+        await app.confirmation.validateSummary(car.color, car.price)
+    })
+})
+
+
