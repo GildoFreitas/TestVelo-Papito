@@ -35,3 +35,7 @@ docs/db-password.txt
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Supabase CLI (cache local, regravado a cada uso do CLI)
+supabase/.temp/
+supabase/.branches/
